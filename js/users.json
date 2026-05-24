@@ -1,0 +1,37 @@
+{
+  "users": [
+    {
+      "login": "artin",
+      "name": "ارتین",
+      "public_repos": 24,
+      "followers": 120,
+      "following": 45,
+      "created_at": "2020-01-15",
+      "avatar_url": "https://..."
+    },
+    {
+      "login": "mohammad",
+      "name": "محمد",
+      "public_repos": 8,
+      "followers": 35,
+      "following": 12,
+      "created_at": "2021-06-20"
+    },
+    {
+      "login": "sara",
+      "name": "سارا",
+      "public_repos": 42,
+      "followers": 230,
+      "following": 67,
+      "created_at": "2019-03-10"
+    },
+    {
+      "login": "reza",
+      "name": "رضا",
+      "public_repos": 3,
+      "followers": 5,
+      "following": 2,
+      "created_at": "2023-01-05"
+    }
+  ]
+}

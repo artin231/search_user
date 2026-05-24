@@ -1,0 +1,245 @@
+index.html:
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="search_box">
+            <div class="search">
+                <input type="text" class="search_inp" placeholder="search yout github account" required>
+                <button type="button" class="btn-submit">submit search</button>
+            </div>
+            <div class="result">
+
+            </div>
+        </div>
+        <div class="history_box">
+            
+            <h1>history</h1>
+            <div class="inner">
+
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
+
+style.css:
+body {
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+    background-color: rgb(7, 151, 38);
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+.container .search_box {
+    width: 400px;
+    height: 500px;
+    background-color: rgb(18, 216, 0);
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.436);
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1%;
+    overflow: auto;
+}
+
+.container .search_box .search {
+    width: 100%;
+    height: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+
+}
+
+.container .search_box::-webkit-scrollbar {
+    background: transparent;
+}
+
+.container .search_box::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 30px;
+}
+
+.container .search_box .search input {
+    width: 90%;
+    height: 40px;
+    background-color: transparent;
+    border: 2px solid black;
+    border-radius: 40px;
+    padding-left: 2%;
+    color: rgb(0, 0, 0);
+    font-size: 20px;
+    outline: none;
+}
+
+.container .search_box .search input::placeholder {
+    color: rgb(0, 0, 0);
+    font-size: 20px;
+}
+
+.container .search_box .search button {
+    width: 50%;
+    height: 40px;
+    border-radius: 15px;
+    background-color: rgb(223, 223, 223);
+    border: 2px solid black;
+    font-size: 20px;
+}
+
+.container .search_box .result {
+    width: 100%;
+    height: 70%;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+hr {
+    width: 100%;
+}
+
+h1,
+p {
+    margin: 0;
+}
+
+.container .history_box {
+    width: 400px;
+    height: 500px;
+    background-color: rgb(18, 216, 0);
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.436);
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1%;
+    overflow: auto;
+    direction: rtl;
+}
+
+.container .history_box .inner{
+    width: 100%;
+}
+
+common.js:
+export const search_input = document.querySelector('.search_inp');
+export const btn_sub = document.querySelector('.btn-submit');
+export const result = document.querySelector('.result'); 
+export const history = document.querySelector('.inner')
+
+export let state = {history:[]};
+
+main.js:
+import './search.js';
+
+search.js:
+import {
+    search_input,
+    btn_sub,
+    result,
+    state,
+    history
+} from './common.js';
+
+window.addEventListener('DOMContentLoaded', (e) => {
+    if(localStorage.getItem("history")){
+    let a = JSON.parse(localStorage.getItem("history"));
+    console.log(a);
+    for (let i = 0; i < a.length; i++) {
+        history.innerHTML += `<h1>${i}- ${a[i].search_v}</h1>
+    <hr style="width:100%;">`;
+    }
+    if (!a.length == 0) {
+        state.history = JSON.parse(localStorage.getItem("history"));
+    }
+}
+})
+let istrue = false;
+
+btn_sub.addEventListener('click', async e => {
+    result.innerHTML = '';
+    let search = search_input.value;
+    try {
+        let res = await fetch(`./js/users.json`);
+        if (!res) {
+            throw new Error("something went wrong");
+
+        }
+        let dt = await res.json();
+        let { users } = dt;
+        let fil_user = users.filter(i => {
+            let g = i.login.toLowerCase();
+            return g.includes(search.toLowerCase())
+        })
+        console.log(fil_user);
+        if (fil_user == 0) {
+            result.innerHTML = '<h1>no accounts were found</h1>';
+            console.log(1);
+            istrue = false;
+
+        }
+        else {
+            result.innerHTML += `<h1>${fil_user.length} was found</h1>`
+            fil_user.forEach(i => {
+                result.innerHTML += `
+            <p>login: ${i.login}</p>
+            <p>name: ${i.name}</p>
+            <p>public_repos: ${i.public_repos}</p>
+            <p>followers: ${i.followers}</p>
+            <p>following: ${i.following}</p>
+            <p>created_at: ${i.created_at}</p>
+            <hr>
+            `;
+
+            })
+            istrue = true;
+
+        };
+        let obj_s = {
+            search_v: search,
+            res: fil_user
+        };
+        console.log(!obj_s.res.length == 0);
+
+        let i = state.history.find(i => i.search_v == obj_s.search_v);
+        if (!i && istrue) {
+            state.history.push(obj_s);
+            localStorage.setItem("history", JSON.stringify(state.history));
+        }
+
+        history.innerHTML = '';
+        for (let i = 0; i < state.history.length; i++) {
+            history.innerHTML += `<h1>${i}- ${state.history[i].search_v}</h1>
+    <hr style="width:100%;">`;
+        }
+
+    } catch (o) {
+        console.log(o);
+
+        result.innerHTML = 'there was a error';
+    }
+})
